@@ -1,0 +1,5 @@
+<launch>
+  <node pkg="turtlebot3_autorace_detect" type="detect_tag_sign" name="detect_tag_sign" output="screen">
+    <remap from="/detect/scan" to="/scan" />
+  </node>
+</launch>
