@@ -112,22 +112,6 @@ class DetectSign():
             rospy.loginfo("Object height information not available")
     
 
-    def detectObject(self, cv_image):
-        # Perform object detection and obtain the bounding rectangle
-        # Here, you can use cv2.boundingRect() to obtain the bounding rectangle
-        # of the detected object in the image
-        gray = cv2.cvtColor(cv_image, cv2.COLOR_BGR2GRAY)
-        _, binary = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
-        contours, _ = cv2.findContours(binary, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-        if len(contours) > 0:
-            # Assuming you want to detect the largest contour
-            largest_contour = max(contours, key=cv2.contourArea)
-            x, y, w, h = cv2.boundingRect(largest_contour)
-            return (x, y, w, h)
-        else:
-            return None
-
     def fnPreproc(self):
         # Initiate SIFT detector
         self.sift = cv2.SIFT_create()
@@ -166,23 +150,7 @@ class DetectSign():
         else:
             self.TrafficSign = Enum('TrafficSign', 'tag left right')
             self.counter = 1
-            # Convert the CompressedImage message to OpenCV image
-            cv_image = self.cvBridge.compressed_imgmsg_to_cv2(image_msg)
-
-            # Perform object detection and obtain bounding rectangle
-            # Assuming you have implemented the object detection logic
-            # and obtained the bounding rectangle as rect
-            rect = self.detectObject(cv_image)
-
-            # Extract the height of the object from the bounding rectangle
-            object_height_px = rect[3]  # Height of the bounding rectangle in pixels
-
-            # Calculate the distance using the object height in pixels
-            if object_height_px is not None:
-                distance = (self.focal_length * self.object_height * self.image_height) / (object_height_px * self.sensor_height)
-                rospy.loginfo("Distance to object: {:.2f} mm".format(distance))
-            else:
-                rospy.loginfo("Object height information not available")
+            
 
     
 

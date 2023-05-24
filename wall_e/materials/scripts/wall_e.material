@@ -1,0 +1,14 @@
+material wall_e
+{
+  technique
+  {
+    pass
+    {
+      texture_unit
+      {
+        texture tijolos.png
+      }
+    }
+  }
+}
+
