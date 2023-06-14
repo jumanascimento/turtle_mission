@@ -26,7 +26,6 @@
 #include <iostream>
 #include <cstdlib>
 
-
 namespace {
 const char* about = "Pose estimation of ArUco marker images";
 const char* keys  =
@@ -48,6 +47,11 @@ const char* keys  =
 float calculateDistance(float focal_length, float object_height, int image_height, float object_height_px, float sensor_height) {
     float distance_m = (focal_length * object_height * image_height) / (object_height_px * sensor_height);
     return distance_m * 1000.0; // converter metros para milímetros
+}
+
+// Função para calcular o erro de distância
+float calculateDistanceError(float actual_distance, float measured_distance) {
+    return std::abs(actual_distance - measured_distance);
 }
 
 int main(int argc, char **argv)
@@ -142,16 +146,26 @@ int main(int argc, char **argv)
                 << std::endl;
 
             // Cálculo da distância
-float focal_length = 1430.0f;   // Valor fornecido: 1430 px
-float object_height = marker_length_m;
-int image_height = 401;         // Valor fornecido: 401 px
-float object_height_px = tvecs[0](1);
-float sensor_height = 220.0f;   // Valor fornecido: 220 mm
+            float focal_length = 1430.0f;   // Valor fornecido: 1430 px
+            float object_height = 0.103;
+            int image_height = 401;         // Valor fornecido: 401 px
+            float sensor_height = 209.55f;   // Valor fornecido: 220 mm
 
-float distance = (focal_length * object_height * image_height) / (object_height_px * sensor_height);
+            // Get the bounding rectangle of the marker
+            cv::Rect marker_rect = cv::boundingRect(corners[0]);
 
-std::cout << "Distance: " << distance << " mm" << std::endl;
-            
+            // Use the height of the bounding rectangle as the object height in pixels
+            float object_height_px = static_cast<float>(marker_rect.height);
+
+            float distance = calculateDistance(focal_length, object_height, image_height, object_height_px, sensor_height);
+
+            std::cout << "Distance: " << distance << " mm" << std::endl;
+
+            // Calcular o erro de distância
+            float actual_distance = 1000.0; // Distância atual em milímetros
+            float distance_error = calculateDistanceError(actual_distance, distance);
+
+            std::cout << "Distance Error: " << distance_error << " mm" << std::endl;
             
             // Draw axis for each marker
             for(int i=0; i < ids.size(); i++)
